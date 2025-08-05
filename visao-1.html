@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contador de História</title>
+    <style>
+@import url('https://fonts.googleapis.com/css2?family=Old+Standard+TT:ital,wght@0,400;0,700;1,400&display=swap');
+
+.old-standard-tt-regular {
+  font-family: "Old Standard TT", serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.old-standard-tt-bold {
+  font-family: "Old Standard TT", serif;
+  font-weight: 700;
+  font-style: normal;
+}
+
+.old-standard-tt-regular-italic {
+  font-family: "Old Standard TT", serif;
+  font-weight: 400;
+  font-style: italic;
+}
+
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+        }
+
+        body {
+            font-family: 'Old Standard TT', serif;
+            background: #000000;
+            color: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 800px;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .slide {
+            width: 100%;
+            max-width: 700px;
+            padding: 50px;
+            background: linear-gradient(135deg, rgba(15, 15, 15, 0.95), rgba(25, 25, 25, 0.9));
+            border-radius: 25px;
+            backdrop-filter: blur(15px);
+            border: 2px solid rgba(255, 0, 0, 0.2);
+            box-shadow: 
+                0 20px 40px rgba(0, 0, 0, 0.5),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1),
+                0 0 30px rgba(255, 0, 0, 0.1);
+            text-align: center;
+            opacity: 0;
+            transform: translateY(50px) scale(0.95);
+            transition: all 1s cubic-bezier(0.4, 0, 0.2, 1);
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .slide.active {
+            opacity: 1;
+            transform: translate(-50%, -50%) translateY(0) scale(1);
+        }
+
+        .slide h2 {
+            font-size: 2.5rem;
+            margin-bottom: 30px;
+            color: #ff0000;
+            text-shadow: 0 0 20px rgba(255, 0, 0, 0.5);
+        }
+
+        .slide p {
+            font-size: 1.4rem;
+            line-height: 2;
+            margin-bottom: 25px;
+            color: #f0f0f0;
+            text-align: justify;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+            letter-spacing: 0.5px;
+        }
+
+        .slide img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            margin-top: 20px;
+            pointer-events: none;
+            -webkit-user-drag: none;
+            -khtml-user-drag: none;
+            -moz-user-drag: none;
+            -o-user-drag: none;
+            user-drag: none;
+        }
+
+        .slide:last-child {
+            padding: 30px 50px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .slide:last-child img {
+            max-width: 80%;
+            max-height: 70vh;
+            width: auto;
+            height: auto;
+            border-radius: 20px;
+            box-shadow: 
+                0 25px 50px rgba(0, 0, 0, 0.8),
+                0 0 40px rgba(255, 0, 0, 0.2);
+            margin: 0;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+            object-fit: contain;
+            pointer-events: none;
+            -webkit-user-drag: none;
+            -khtml-user-drag: none;
+            -moz-user-drag: none;
+            -o-user-drag: none;
+            user-drag: none;
+            transition: all 0.5s ease;
+        }
+
+        .controls {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 15px;
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            width: auto;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            background: linear-gradient(45deg, #ff0000, #cc0000);
+            border: none;
+            border-radius: 25px;
+            color: #ffffff;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(255, 0, 0, 0.3);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 0, 0, 0.6);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .progress {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 8px;
+            z-index: 1000;
+        }
+
+        .progress-dot {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+        }
+
+        .progress-dot.active {
+            background: #ff0000;
+            border-color: rgba(255, 0, 0, 0.5);
+            box-shadow: 
+                0 0 15px rgba(255, 0, 0, 0.6),
+                inset 0 0 5px rgba(255, 255, 255, 0.2);
+            transform: scale(1.2);
+        }
+
+        @media (max-width: 768px) {
+            .slide {
+                padding: 30px 20px;
+                margin: 20px;
+            }
+
+            .slide h2 {
+                font-size: 2rem;
+            }
+
+            .slide p {
+                font-size: 1.1rem;
+            }
+
+            .slide:last-child {
+                padding: 15px 20px;
+            }
+
+            .slide:last-child img {
+                max-width: 85%;
+                max-height: 60vh;
+            }
+
+            .controls {
+                bottom: 20px;
+                left: 50%;
+                transform: translateX(-50%);
+                justify-content: center;
+                align-items: center;
+            }
+
+            .btn {
+                padding: 10px 20px;
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="progress" id="progress">
+        <!-- As bolinhas serão criadas dinamicamente pelo JavaScript -->
+    </div>
+
+    <div class="container">
+        <div class="slide active">
+            <p>Você corre.</p>
+            <p>Não sabe de quê. Não lembra por quê.</p>
+            <p>Mas precisa correr.</p>
+            <p>Seu coração bate tão alto que abafa o mundo.</p>
+            <p>Só existe você… e o vazio que te persegue por dentro.</p>
+        </div>
+
+        <div class="slide">
+            <p>Algo foi tirado. Algo que era tudo.</p>
+            <p>E agora você não é nada.</p>
+        </div>
+
+        <div class="slide">
+            <p>A floresta te cerca como uma prisão viva.</p>
+            <p>A terra afunda nos seus pés. As raízes parecem dedos puxando.</p>
+            <p>Mas você não liga.</p>
+            <p>Você já não sente mais medo.</p>
+            <p>Só um buraco no lugar do peito.</p>
+        </div>
+
+        <div class="slide">
+            <p>A respiração rasga sua garganta.</p>
+            <p>Você se joga no chão, de joelhos.</p>
+            <p>Raspa o rosto contra a terra úmida.</p>
+            <p>Ri.</p>
+            <p>Ri como uma criança doente.</p>
+        </div>
+
+        <div class="slide">
+            <p>E então chora.</p>
+        </div>
+
+        <div class="slide">
+            <p>Mas é um choro feio. Grosseiro.</p>
+            <p>Sem sentido.</p>
+        </div>
+
+        <div class="slide">
+            <p>Suas mãos trepidam, agarram o próprio rosto.</p>
+            <p>Você arranha. Você aperta. Você escava.</p>
+            <p>A carne cede.</p>
+            <p>A unha entra.</p>
+        </div>
+
+        <div class="slide">
+            <p>E então, como se fosse óbvio — você puxa o próprio olho.</p>
+        </div>
+
+        <div class="slide">
+            <p>Grita.</p>
+            <p>Grita tão alto que o céu parece estremecer.</p>
+            <p>Mas não para.</p>
+            <p>Não pensa.</p>
+        </div>
+
+        <div class="slide">
+            <p>O globo pulsa na mão. Quente. Vivo.</p>
+            <p>Você o encara por um segundo.</p>
+            <p>Ele te encara de volta.</p>
+        </div>
+
+        <div class="slide">
+            <p>E você sorri.</p>
+            <p>Um sorriso torto. Idiota. Selvagem.</p>
+        </div>
+
+        <div class="slide">
+            <p>Você come.</p>
+        </div>
+
+        <div class="slide">
+            <p>Morde como se fosse fruta.</p>
+            <p>O líquido escorre. A textura é horrível.</p>
+            <p>Mas você mastiga.</p>
+            <p>E engole.</p>
+        </div>
+
+        <div class="slide">
+            <p>E nesse instante… você sente.</p>
+            <p>Uma presença.</p>
+            <p>Antiga.</p>
+            <p>Silenciosa.</p>
+            <p>Observando. Reconhecendo. Tocando.</p>
+        </div>
+
+        <div class="slide">
+            <p>Algo sussurra dentro de você.</p>
+        </div>
+
+        <div class="slide">
+            <p>E você sussurra de volta.</p>
+        </div>
+
+        <div class="slide">
+            <img src="assets/visao-1.jpg" alt="Cidade perdida na floresta">
+        </div>
+    </div>
+
+    <div class="controls">
+        <button class="btn" id="prevBtn" onclick="previousSlide()">Anterior</button>
+        <button class="btn" id="nextBtn" onclick="nextSlide()">Próximo</button>
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const progressContainer = document.getElementById('progress');
+        let progressDots = [];
+
+        // Criar bolinhas de progresso dinamicamente
+        function createProgressDots() {
+            progressContainer.innerHTML = '';
+            progressDots = [];
+            
+            for (let i = 0; i < slides.length; i++) {
+                const dot = document.createElement('div');
+                dot.className = 'progress-dot';
+                if (i === 0) dot.classList.add('active');
+                
+                dot.addEventListener('click', () => {
+                    currentSlide = i;
+                    showSlide(currentSlide);
+                });
+                
+                progressContainer.appendChild(dot);
+                progressDots.push(dot);
+            }
+        }
+
+        function showSlide(n) {
+            slides.forEach(slide => slide.classList.remove('active'));
+            progressDots.forEach(dot => dot.classList.remove('active'));
+            
+            slides[n].classList.add('active');
+            progressDots[n].classList.add('active');
+            
+            // Atualizar botões
+            prevBtn.disabled = n === 0;
+            nextBtn.disabled = n === slides.length - 1;
+        }
+
+        function nextSlide() {
+            if (currentSlide < slides.length - 1) {
+                currentSlide++;
+                showSlide(currentSlide);
+            }
+        }
+
+        function previousSlide() {
+            if (currentSlide > 0) {
+                currentSlide--;
+                showSlide(currentSlide);
+            }
+        }
+
+        // Navegação com teclado
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'ArrowRight' || e.key === ' ') {
+                nextSlide();
+            } else if (e.key === 'ArrowLeft') {
+                previousSlide();
+            }
+        });
+
+        // Inicializar
+        createProgressDots();
+        showSlide(0);
+    </script>
+</body>
+</html>
